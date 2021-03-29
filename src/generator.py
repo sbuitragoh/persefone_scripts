@@ -46,7 +46,7 @@ class DataGenerator(Dataset):
     def __getitem__(self, i):
         img = self.dataset[self.split]['dt'][i]
         img = cv.imread(img, 0)
-        print(f"{self.dataset[self.split]['dt'][i]} con dimensiones {np.shape(img)}")
+        # print(f"{self.dataset[self.split]['dt'][i]} con dimensiones {np.shape(img)}")
         # making image compatible with resnet
         img = np.repeat(img[..., np.newaxis], 3, -1)
         img = pp.normalization(img)
