@@ -37,7 +37,7 @@ class DataGenerator(Dataset):
             self.dataset[self.split]['gt'] = self.dataset[self.split]['gt'][randomize]
 
             # decode sentences from byte
-            self.dataset[self.split]['gt'] = [x.decode() for x in self.dataset[self.split]['gt']]
+            # self.dataset[self.split]['gt'] = [x.decode() for x in self.dataset[self.split]['gt']]
 
         self.size = len(self.dataset[self.split]['gt'])
 
