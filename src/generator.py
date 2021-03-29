@@ -26,9 +26,6 @@ class DataGenerator(Dataset):
             self.dataset[self.split]['dt'] = np.array(f[self.split]['dt'])
             self.dataset[self.split]['gt'] = np.array(f[self.split]['gt'])
 
-            for i, path in enumerate(f[self.split]['dt']):
-                self.dataset[self.split]['dt'][i] = cv.imread(str(path)[2:-1], 0)
-
             randomize = np.arange(len(self.dataset[self.split]['gt']))
             np.random.seed(33)
             np.random.shuffle(randomize)
@@ -47,10 +44,10 @@ class DataGenerator(Dataset):
 
 
     def __getitem__(self, i):
-        print(self.dataset[self.split]['gt'][i])
         img = self.dataset[self.split]['dt'][i]
-        # img = str(img)[2:-1]
-        # img = cv.imread(img, 0)
+        print(img)
+        img = cv.imread(img, 0)
+        print(np.shape(img))
         # making image compatible with resnet
         img = np.repeat(img[..., np.newaxis], 3, -1)
         img = pp.normalization(img)
