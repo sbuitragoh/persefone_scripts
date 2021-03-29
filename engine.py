@@ -129,7 +129,8 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
         c += 1
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            torch.save(model.state_dict(), target_path)
+            t_path = r'/content/output/model_test.pth'
+            torch.save(model.state_dict(), t_path)
             c = 0
 
         if c > 4:
