@@ -71,6 +71,13 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
     return epoch_loss / len(dataloader)
 
 
+def plot_error(t_e, v_e):
+    with open('/content/output/t_error.txt', 'a') as t_error:
+        t_error.write(t_e)
+    with open('/content/output/v_error.txt', 'a') as v_error:
+        v_error.write(v_e)
+
+
 def get_memory(model, imgs):
     x = model.conv(model.get_feature(imgs))
     bs, _, H, W = x.shape
@@ -140,5 +147,7 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
         print(f'Time: {epoch_mins}m {epoch_secs}s')
         print(f'Train Loss: {train_loss:.3f}')
         print(f'Val   Loss: {valid_loss:.3f}')
+        plot_error(t_e=train_loss, v_e=valid_loss)
+        print(f'Loss values saved!')
 
     print(best_valid_loss)
