@@ -73,9 +73,9 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
 
 def plot_error(t_e, v_e):
     with open('/content/output/t_error.txt', 'a') as t_error:
-        t_error.write(t_e)
+        t_error.write(t_e+'\n')
     with open('/content/output/v_error.txt', 'a') as v_error:
-        v_error.write(v_e)
+        v_error.write(v_e+'\n')
 
 
 def get_memory(model, imgs):
