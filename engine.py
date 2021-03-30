@@ -147,7 +147,8 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
         print(f'Time: {epoch_mins}m {epoch_secs}s')
         print(f'Train Loss: {train_loss:.3f}')
         print(f'Val   Loss: {valid_loss:.3f}')
-        plot_error(t_e=train_loss, v_e=valid_loss)
+        print(type(train_loss.item()), train_loss.item())
+        plot_error(t_e=train_loss.item(), v_e=valid_loss.item())
         print(f'Loss values saved!')
 
     print(best_valid_loss)
