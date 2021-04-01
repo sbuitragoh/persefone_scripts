@@ -84,7 +84,11 @@ def verify_transcriptions(transcription):
         text_transcript = tr.readlines()
         text_transcript = text_transcript[0]
     with open(transcription, 'w') as wr:
-        wr.write(text_transcript.replace('\t', '    '))
+        text_transcript = text_transcript.replace('\t', '    ')
+        text_transcript = text_transcript.replace('(', '')
+        text_transcript = text_transcript.replace(')', '')
+        text_transcript = text_transcript.replace('*', '')
+        wr.write(text_transcript)
 
 
 if __name__ == '__main__':
