@@ -9,7 +9,7 @@ class LabelSmoothing(nn.Module):
 
     def __init__(self, size, padding_idx=0, smoothing=0.0):
         super(LabelSmoothing, self).__init__()
-        self.criterion = nn.KLDivLoss(size_average=False)
+        self.criterion = nn.KLDivLoss(size_average=False, reduction='batchmean')
         self.padding_idx = padding_idx
         self.confidence = 1.0 - smoothing
         self.smoothing = smoothing
@@ -33,6 +33,9 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
     model.train()
     total_loss = 0
     for batch, (imgs, labels_y,) in enumerate(dataloader):
+	if torch.cuda.is_available():
+            imgs, labels_y = imgs.cuda(), labels_y.cuda()
+	
         imgs = imgs.to(device)
         labels_y = labels_y.to(device)
 
@@ -44,7 +47,7 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5) #Change of the NORM from 0.2
         optimizer.step()
         total_loss += (loss.item() * norm)
 
@@ -125,7 +128,6 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
     best_valid_loss = np.inf
     c = 0
     for epoch in range(epochs):
-        print(f'Epoch: {epoch + 1:02}', 'learning rate{}'.format(scheduler.get_last_lr()))
         start_time = time.time()
 
         train_loss, outputs = train(model, criterion, optimizer, train_loader, tokenizer.vocab_size, device)
@@ -144,9 +146,15 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
             scheduler.step()
             c = 0
 
-        print(f'Time: {epoch_mins}m {epoch_secs}s')
-        print(f'Train Loss: {train_loss:.3f}')
-        print(f'Val   Loss: {valid_loss:.3f}')
+        print(f'Epoch: {epoch + 1:02}\t \
+                Training Loss: {train_loss:.3f}\t \
+                Validation Loss: {valid_loss:.3f}\t \
+                lr: {scheduler.get_last_lr()}\t \
+                Time: {epoch_mins}m {epoch_secs}s')
+        # print(f'Epoch: {epoch + 1:02}', 'learning rate{}'.format(scheduler.get_last_lr()))
+        # print(f'Time: {epoch_mins}m {epoch_secs}s')
+        # print(f'Train Loss: {train_loss:.3f}')
+        # print(f'Val   Loss: {valid_loss:.3f}')
         plot_error(t_e=str(train_loss.item()), v_e=str(valid_loss.item()))
         print(f'Loss values saved!')
 
