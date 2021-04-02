@@ -33,7 +33,7 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
     model.train()
     total_loss = 0
     for batch, (imgs, labels_y,) in enumerate(dataloader):
-	if torch.cuda.is_available():
+        if torch.cuda.is_available():
             imgs, labels_y = imgs.cuda(), labels_y.cuda()
 	
         imgs = imgs.to(device)
