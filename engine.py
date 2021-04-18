@@ -14,17 +14,12 @@ class JSD(nn.Module):
     def forward(self, input, target):
         input_prob = F.softmax(input, dim=1)
         target_prob = F.softmax(target, dim=1)
-
-        print(f'Prob. Input: {input_prob}, Prob. Target: {target_prob}')
         m = 0.5 * (input_prob + target_prob)
-        print(f'Mean of Prob.: {m}')
+
         loss = 0
         loss += F.kl_div(F.log_softmax(input_prob, dim=1), m, reduction='batchmean')
-        print(f'P|M : {loss}')
         loss += F.kl_div(F.log_softmax(target_prob, dim=1), m, reduction='batchmean')
-        print(f'P|M + Q|M : {loss}')
         loss *= 0.5
-        print(f'Total loss: {loss}')
 
         return loss
 
@@ -71,14 +66,15 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
         # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
         #                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-        loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+        loss = criterion(output.contiguous().view(-1, vocab_length),
                          labels_y[:, 1:].contiguous().view(-1).long())
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2) #Change of the NORM from 0.2 (0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5) #Change of the NORM from 0.2 (0.5)
         optimizer.step()
         # total_loss += (loss.item() * norm)
         total_loss += loss
+        print(f'Loss: {loss}, Total Loss: {total_loss}')
 
     return total_loss / len(dataloader), output
 
@@ -98,11 +94,12 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
             # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
             #                              labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-            loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+            loss = criterion(output.contiguous().view(-1, vocab_length),
                              labels_y[:, 1:].contiguous().view(-1).long())
 
             # epoch_loss += (loss.item() * norm)
             epoch_loss += loss
+            print(f'Loss: {loss}, Total Loss: {epoch_loss}')
 
     return epoch_loss / len(dataloader)
 
