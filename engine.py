@@ -15,12 +15,18 @@ class JSD(nn.Module):
         input_prob = F.softmax(input, dim=1)
         target_prob = F.softmax(target, dim=1)
 
+        print(f'Prob. Input: {input_prob}, Prob. Target: {target_prob}')
         m = 0.5 * (input_prob + target_prob)
+        print(f'Mean of Prob.: {m}')
         loss = 0
         loss += F.kl_div(F.log_softmax(input_prob, dim=1), m, reduction='batchmean')
+        print(f'P|M : {loss}')
         loss += F.kl_div(F.log_softmax(target_prob, dim=1), m, reduction='batchmean')
+        print(f'P|M + Q|M : {loss}')
+        loss *= 0.5
+        print(f'Total loss: {loss}')
 
-        return 0.5 * loss
+        return loss
 
 
 class LabelSmoothing(nn.Module):
@@ -174,8 +180,8 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
             c = 0
 
         print(f'Epoch: {epoch + 1:02}\t \
-                Training Loss: {train_loss:.3f}\t \
-                Validation Loss: {valid_loss:.3f}\t \
+                Training Loss: {train_loss:.5f}\t \
+                Validation Loss: {valid_loss:.5f}\t \
                 lr: {scheduler.get_last_lr()}\t \
                 Time: {epoch_mins}m {epoch_secs}s')
         # print(f'Epoch: {epoch + 1:02}', 'learning rate{}'.format(scheduler.get_last_lr()))
