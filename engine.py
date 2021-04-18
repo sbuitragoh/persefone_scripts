@@ -52,6 +52,7 @@ class LabelSmoothing(nn.Module):
 def train(model, criterion, optimizer, dataloader, vocab_length, device):
     model.train()
     total_loss = 0
+    loss_real = []
     for batch, (imgs, labels_y,) in enumerate(dataloader):
         if torch.cuda.is_available():
             imgs, labels_y = imgs.cuda(), labels_y.cuda()
@@ -70,12 +71,15 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
                          labels_y[:, 1:].contiguous().view(-1).long())
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5) #Change of the NORM from 0.2 (0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2) #Change of the NORM from 0.2 (0.5)
         optimizer.step()
         # total_loss += (loss.item() * norm)
         total_loss += loss
+        loss_real.append(loss)
         print(f'Loss: {loss}, Total Loss: {total_loss}')
 
+    print(f'Suma de las pérdidas: {np.sum(np.array(loss_real))}')
+    print(f'Tamaño del dataloader: {len(dataloader)}')
     return total_loss / len(dataloader), output
 
 
