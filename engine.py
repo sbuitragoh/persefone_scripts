@@ -52,7 +52,6 @@ class LabelSmoothing(nn.Module):
 def train(model, criterion, optimizer, dataloader, vocab_length, device):
     model.train()
     total_loss = 0
-    loss_real = []
     for batch, (imgs, labels_y,) in enumerate(dataloader):
         if torch.cuda.is_available():
             imgs, labels_y = imgs.cuda(), labels_y.cuda()
@@ -71,16 +70,12 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
                          labels_y[:, 1:].contiguous().view(-1).long())
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2) #Change of the NORM from 0.2 (0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5) #Change of the NORM from 0.2 (0.5)
         optimizer.step()
-        # total_loss += (loss.item() * norm)
         total_loss += loss
-        loss_real.append(loss)
-        print(f'Loss: {loss}, Total Loss: {total_loss}')
 
-    print(f'Suma de las pérdidas: {np.sum(np.array(loss_real))}')
-    print(f'Tamaño del dataloader: {len(dataloader)}')
-    return total_loss / len(dataloader), output
+    # return total_loss / len(dataloader), output
+    return total_loss, output
 
 
 def evaluate(model, criterion, dataloader, vocab_length, device):
@@ -103,9 +98,9 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
 
             # epoch_loss += (loss.item() * norm)
             epoch_loss += loss
-            print(f'Loss: {loss}, Total Loss: {epoch_loss}')
 
-    return epoch_loss / len(dataloader)
+    # return epoch_loss / len(dataloader)
+    return epoch_loss
 
 
 def plot_error(t_e, v_e):
@@ -185,10 +180,7 @@ def run_epochs(model, criterion, optimizer, scheduler, train_loader, val_loader,
                 Validation Loss: {valid_loss:.5f}\t \
                 lr: {scheduler.get_last_lr()}\t \
                 Time: {epoch_mins}m {epoch_secs}s')
-        # print(f'Epoch: {epoch + 1:02}', 'learning rate{}'.format(scheduler.get_last_lr()))
-        # print(f'Time: {epoch_mins}m {epoch_secs}s')
-        # print(f'Train Loss: {train_loss:.3f}')
-        # print(f'Val   Loss: {valid_loss:.3f}')
+
         plot_error(t_e=str(train_loss.item()), v_e=str(valid_loss.item()))
         print(f'Loss values saved!')
 
