@@ -1,15 +1,34 @@
 from torch import nn
+from torch.nn import functional as F
 import torch
 from torch.autograd import Variable
 import numpy as np
 import time
 
 
+class JSD(nn.Module):
+
+    def __init__(self):
+        super(JSD, self).__init__()
+
+    def forward(self, input, target):
+        input_prob = F.softmax(input)
+        target_prob = F.softmax(target)
+
+        m = 0.5 * (input_prob + target_prob)
+        loss = 0
+        loss += F.kl_div(F.log_softmax(input_prob, dim=1), m, reduction='batchmean')
+        loss += F.kl_div(F.log_softmax(target_prob, dim=1), m, reduction='batchmean')
+
+        return 0.5 * loss
+
+
 class LabelSmoothing(nn.Module):
 
     def __init__(self, size, padding_idx=0, smoothing=0.0):
         super(LabelSmoothing, self).__init__()
-        self.criterion = nn.KLDivLoss(size_average=False, reduction='batchmean')
+        # Change criterion to J-S Divergence
+        self.criterion = JSD()
         self.padding_idx = padding_idx
         self.confidence = 1.0 - smoothing
         self.smoothing = smoothing
@@ -43,7 +62,10 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
         output = model(imgs.float(), labels_y.long()[:, :-1])
 
         norm = (labels_y != 0).sum()
-        loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+        # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+        #                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
+
+        loss = criterion(output.contiguous().view(-1, vocab_length),
                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
         loss.backward()
@@ -66,7 +88,10 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
             output = model(imgs.float(), labels_y.long()[:, :-1])
 
             norm = (labels_y != 0).sum()
-            loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+            # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
+            #                              labels_y[:, 1:].contiguous().view(-1).long()) / norm
+
+            loss = criterion(output.contiguous().view(-1, vocab_length),
                              labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
             epoch_loss += (loss.item() * norm)
