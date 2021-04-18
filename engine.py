@@ -12,8 +12,8 @@ class JSD(nn.Module):
         super(JSD, self).__init__()
 
     def forward(self, input, target):
-        input_prob = F.softmax(input)
-        target_prob = F.softmax(target)
+        input_prob = F.softmax(input, dim=1)
+        target_prob = F.softmax(target, dim=1)
 
         m = 0.5 * (input_prob + target_prob)
         loss = 0
