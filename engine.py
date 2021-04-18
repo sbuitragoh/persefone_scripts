@@ -65,14 +65,14 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
         # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
         #                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-        loss = criterion(output.contiguous().view(-1, vocab_length),
+        loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
                          labels_y[:, 1:].contiguous().view(-1).long())
 
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2) #Change of the NORM from 0.2 (0.5)
         optimizer.step()
         # total_loss += (loss.item() * norm)
-        total_loss += loss.item()
+        total_loss += loss
 
     return total_loss / len(dataloader), output
 
@@ -92,11 +92,11 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
             # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
             #                              labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-            loss = criterion(output.contiguous().view(-1, vocab_length),
+            loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
                              labels_y[:, 1:].contiguous().view(-1).long())
 
             # epoch_loss += (loss.item() * norm)
-            epoch_loss += loss.item()
+            epoch_loss += loss
 
     return epoch_loss / len(dataloader)
 
