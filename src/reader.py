@@ -56,7 +56,6 @@ class Dataset:
 
             for line in paths[i]:
                 path_current_img = os.path.join(img_path, f"{line}.png")
-                # current_img = cv.imread(path_current_img, 0)
                 dataset[i]['dt'].append(path_current_img)
                 dataset[i]['gt'].append(gt_dict[line])
 

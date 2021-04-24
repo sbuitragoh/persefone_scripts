@@ -218,18 +218,11 @@ def cut_page(img):
 
     proy_h = np.where(proy_hn >= mean_h)[0]
     proy_v = np.where(proy_vn >= mean_v)[0]
-    margen_1 = 0
-    margen_2 = height
-    margen_3 = 0
-    margen_4 = width
-    margen_1_cnt = 0
-    margen_2_cnt = 0
-    margen_3_cnt = 0
-    margen_4_cnt = 0
+    margen_1, margen_2, margen_3, margen_4 = 0, height, 0, width
+    margen_1_cnt, margen_2_cnt, margen_3_cnt, margen_4_cnt = 0, 0, 0, 0
 
     for h in range(len(proy_h) - 1):
-        h_1 = proy_h[h]
-        h_2 = proy_h[h + 1]
+        h_1, h_2 = proy_h[h], proy_h[h + 1]
         hh_1 = proy_h[(len(proy_h) - 1) - h]
         hh_2 = proy_h[(len(proy_h) - 1) - (h + 1)]
         if h_2 - h_1 > width // 10 and margen_3_cnt == 0:
@@ -242,8 +235,7 @@ def cut_page(img):
             margen_4_cnt = 1
 
     for v in range(len(proy_v) - 1):
-        v_1 = proy_v[v]
-        v_2 = proy_v[v + 1]
+        v_1, v_2 = proy_v[v], proy_v[v + 1]
         vv_1 = proy_v[(len(proy_v) - 1) - v]
         vv_2 = proy_v[(len(proy_v) - 1) - (v + 1)]
         if v_2 - v_1 > height // 20 and margen_1_cnt == 0:
@@ -277,8 +269,7 @@ def line_obtention(img):
     set_lines = np.where(lines_map < set_limit)[0]
     cnt = 0
     num_1 = set_lines[0]
-    lines_in_image = []
-    whites_in_image = []
+    lines_in_image, whites_in_image = [], []
 
     for j in range(len(set_lines) - 1):
         if cnt == 0:
@@ -331,17 +322,15 @@ def rotate_image(img):
     blur = cv.blur(img_copy, (30, 30), cv.BORDER_DEFAULT)
     blurred = cv.erode(blur, kernel, iterations=3)
 
-    left = blurred[:, :x // 2]
-    right = blurred[:, x // 2:]
+    left, right = blurred[:, :x // 2], blurred[:, x // 2:]
+
     left_sum = np.sum(left, axis=1)/np.max(np.sum(left, axis=1))
     right_sum = np.sum(right, axis=1) / np.max(np.sum(right, axis=1))
 
     blacks_left = np.where(left_sum <= np.mean(left_sum))[0]
     blacks_right = np.where(right_sum <= np.mean(right_sum))[0]
-    bl_lst = [blacks_left[0]]
-    br_lst = [blacks_right[0]]
-    bbbl = []
-    bbbr = []
+    bl_lst, br_lst = [blacks_left[0]], [blacks_right[0]]
+    bbbl, bbbr = [], []
     limit = 1000
 
     for bl in range(len(blacks_left) - 1):
@@ -369,15 +358,13 @@ def rotate_image(img):
             bbbr.append(br_lst[br_i]+np.where(range_br == local_min_br)[0][0])
 
     if np.abs(bbbr[0]-bbbl[0]) > 50:
-        min_left = bbbl[1]
-        min_right = bbbr[1]
+        min_left, min_right = bbbl[1], bbbr[1]
     else:
-        min_left = bbbl[0]
-        min_right = bbbr[0]
+        min_left, min_right = bbbl[0], bbbr[0]
 
     lim = np.max([min_left, min_right]) - 25
-    bbl_lst = np.array(bbbl)-lim
-    bbr_lst = np.array(bbbr)-lim
+    bbl_lst = np.array(bbbl) - lim
+    bbr_lst = np.array(bbbr) - lim
     bbl_limit = np.max(bbl_lst)
     bbr_limit = np.max(bbr_lst)
 
@@ -399,8 +386,7 @@ def rotate_image(img):
         if np.abs(c_1) < np.abs(limit):
             limit = c_1
 
-    y_side = limit
-    x_side = x // 2
+    y_side, x_side = limit, x // 2
     angle_test = np.abs(np.arctan2(y_side, x_side))
 
     center = (x // 2, y // 2)
@@ -476,8 +462,7 @@ def line_management(img, img_size, lines, page_number):
 def line_centroids_graph(line_components):
 
     centroids = line_components[3]
-    cent_x = centroids[:, 0]
-    cent_y = centroids[:, 1]
+    cent_x, cent_y = centroids[:, 0], centroids[:, 1]
     xy = np.vstack([cent_x, cent_y])
     z = gaussian_kde(xy)(xy)
     idx = z.argsort()

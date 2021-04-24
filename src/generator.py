@@ -46,7 +46,6 @@ class DataGenerator(Dataset):
     def __getitem__(self, i):
         img = self.dataset[self.split]['dt'][i]
         img = cv.imread(img, 0)
-        # print(f"{self.dataset[self.split]['dt'][i]} con dimensiones {np.shape(img)}")
         # making image compatible with resnet
         img = np.repeat(img[..., np.newaxis], 3, -1)
         img = pp.normalization(img)
@@ -56,7 +55,6 @@ class DataGenerator(Dataset):
             img = self.transform(img)
 
         y_train = self.tokenizer.encode(self.dataset[self.split]['gt'][i])
-
         # padding till max length
         y_train = np.pad(y_train, (0, self.tokenizer.maxlen - len(y_train)))
 
