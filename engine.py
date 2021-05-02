@@ -84,7 +84,7 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
 
     with torch.no_grad():
         for batch, (imgs, labels_y,) in enumerate(dataloader):
-            print(batch, len(imgs), len(labels_y))
+            # print(batch, len(imgs), len(labels_y))
             imgs = imgs.to(device)
             labels_y = labels_y.to(device)
 
@@ -98,10 +98,10 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
                              labels_y[:, 1:].contiguous().view(-1).long())
 
             # epoch_loss += (loss.item() * norm)
-            epoch_loss += loss * norm
+            epoch_loss += loss 
 
     # return epoch_loss / len(dataloader)
-    return epoch_loss / len(dataloader)
+    return epoch_loss 
 
 
 def plot_error(t_e, v_e):
