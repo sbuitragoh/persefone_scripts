@@ -98,7 +98,7 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
 
             # epoch_loss += (loss.item() * norm)
             epoch_loss += loss * norm
-            print(f'Norma: {norm}. Dataloader: {len(dataloader).}')
+            print(f'Norma: {norm}. Dataloader: {len(dataloader)}.')
 
     # return epoch_loss / len(dataloader)
     return epoch_loss
