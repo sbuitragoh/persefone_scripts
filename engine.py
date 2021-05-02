@@ -81,6 +81,7 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
 def evaluate(model, criterion, dataloader, vocab_length, device):
     model.eval()
     epoch_loss = 0
+    print(np.shape(dataloader))
 
     with torch.no_grad():
         for batch, (imgs, labels_y,) in enumerate(dataloader):
@@ -93,12 +94,11 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
             # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
             #                              labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-            loss = criterion(output.contiguous().view(-1, vocab_length),
+            loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
                              labels_y[:, 1:].contiguous().view(-1).long())
 
             # epoch_loss += (loss.item() * norm)
             epoch_loss += loss * norm
-            print(f'Norma: {norm}. Dataloader: {len(dataloader)}.')
 
     # return epoch_loss / len(dataloader)
     return epoch_loss
