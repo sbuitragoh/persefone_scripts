@@ -66,7 +66,7 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
         # loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
         #                          labels_y[:, 1:].contiguous().view(-1).long()) / norm
 
-        loss = criterion(output.contiguous().view(-1, vocab_length),
+        loss = criterion(output.log_softmax(-1).contiguous().view(-1, vocab_length),
                          labels_y[:, 1:].contiguous().view(-1).long())
 
         loss.backward()
@@ -81,10 +81,10 @@ def train(model, criterion, optimizer, dataloader, vocab_length, device):
 def evaluate(model, criterion, dataloader, vocab_length, device):
     model.eval()
     epoch_loss = 0
-    print(dataloader.size)
 
     with torch.no_grad():
         for batch, (imgs, labels_y,) in enumerate(dataloader):
+            print(batch)
             imgs = imgs.to(device)
             labels_y = labels_y.to(device)
 
@@ -101,7 +101,7 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
             epoch_loss += loss * norm
 
     # return epoch_loss / len(dataloader)
-    return epoch_loss
+    return epoch_loss / len(dataloader)
 
 
 def plot_error(t_e, v_e):
