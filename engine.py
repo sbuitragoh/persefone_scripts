@@ -84,7 +84,7 @@ def evaluate(model, criterion, dataloader, vocab_length, device):
 
     with torch.no_grad():
         for batch, (imgs, labels_y,) in enumerate(dataloader):
-            print(batch)
+            print(batch, len(imgs), len(labels_y))
             imgs = imgs.to(device)
             labels_y = labels_y.to(device)
 
