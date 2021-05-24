@@ -86,7 +86,7 @@ class OCR(nn.Module):
 
         # generating subsequent mask for target
         if self.trg_mask is None or self.trg_mask.size(0) != len(trg):
-            self.trg_mask = generate_square_subsequent_mask(trg.shape[1]).to(trg.device)
+            self.trg_mask = generate_square_subsequent_mask(self, trg.shape[1]).to(trg.device)
 
         # Padding mask
         trg_pad_mask = make_len_mask(trg)
