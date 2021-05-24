@@ -86,7 +86,7 @@ class OCR(nn.Module):
 
         # generating subsequent mask for target
         if self.trg_mask is None or self.trg_mask.size(0) != len(trg):
-            self.trg_mask = generate_square_subsequent_mask(self, trg.shape[1]).to(trg.device)
+            self.trg_mask = generate_square_subsequent_mask(trg.shape[1]).to(trg.device)
 
         # Padding mask
         trg_pad_mask = make_len_mask(trg)
@@ -111,6 +111,10 @@ class OCR(nn.Module):
         mask = mask.masked_fill(mask == 1, float('-inf'))
         return mask
 
+def generate_square_subsequent_mask(sz):
+    mask = torch.triu(torch.ones(sz, sz), 1)
+    mask = mask.masked_fill(mask == 1, float('-inf'))
+    return mask
 
 def make_model(vocab_len, hidden_dim=512, nheads=8,
                num_encoder_layers=6, num_decoder_layers=6):
