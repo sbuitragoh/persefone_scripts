@@ -111,10 +111,13 @@ class OCR(nn.Module):
         return self.vocab(output.transpose(0, 1))
 
 
-#def generate_square_subsequent_mask(sz):
-#    mask = torch.triu(torch.ones(sz, sz), 1)
-#    mask = mask.masked_fill(mask == 1, float('-inf'))
-#    return mask
+def generate_square_subsequent_mask(sz):
+    mask = torch.triu(torch.ones(sz, sz), 1)
+    mask = mask.masked_fill(mask == 1, float('-inf'))
+    return mask
+
+def make_len_mask(inp):
+    return (inp == 0).transpose(0, 1)
 
 def make_model(vocab_len, hidden_dim=512, nheads=8,
                num_encoder_layers=6, num_decoder_layers=6):
