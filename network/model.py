@@ -70,6 +70,15 @@ class OCR(nn.Module):
         x = self.backbone.layer4(x)
         return x
 
+    def make_len_mask(self, inp):
+        return (inp == 0).transpose(0, 1)
+
+
+    def generate_square_subsequent_mask(self, sz):
+        mask = torch.triu(torch.ones(sz, sz), 1)
+        mask = mask.masked_fill(mask == 1, float('-inf'))
+        return mask
+
     def forward(self, inputs, trg):
         # propagate inputs through ResNet-101 up to avg-pool layer
         x = self.get_feature(inputs)
@@ -102,19 +111,10 @@ class OCR(nn.Module):
         return self.vocab(output.transpose(0, 1))
 
 
-    def make_len_mask(self, inp):
-        return (inp == 0).transpose(0, 1)
-
-
-    def generate_square_subsequent_mask(self, sz):
-        mask = torch.triu(torch.ones(sz, sz), 1)
-        mask = mask.masked_fill(mask == 1, float('-inf'))
-        return mask
-
-def generate_square_subsequent_mask(sz):
-    mask = torch.triu(torch.ones(sz, sz), 1)
-    mask = mask.masked_fill(mask == 1, float('-inf'))
-    return mask
+#def generate_square_subsequent_mask(sz):
+#    mask = torch.triu(torch.ones(sz, sz), 1)
+#    mask = mask.masked_fill(mask == 1, float('-inf'))
+#    return mask
 
 def make_model(vocab_len, hidden_dim=512, nheads=8,
                num_encoder_layers=6, num_decoder_layers=6):
